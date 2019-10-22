@@ -3,41 +3,44 @@ import { StyleSheet, Text, View, Alert, ScrollView } from 'react-native';
 import { NavigationStackScreenProps } from 'react-navigation-stack';
 import { NavigationScreenOptions, NavigationEvents } from 'react-navigation';
 import { json } from '../utils/api';
-import BlogPreviewCard from '../components/BlogPreviewCard';
+import FirePreviewCard from '../components/FirePreviewCard';
 
 interface IHomeProps extends NavigationStackScreenProps { }
 interface IHomeState {
-  blogs: {
+  fires: {
     id: number,
-    title: string,
-    content: string,
-    authorid: string,
+    lat: number,
+    lon: number,
+    userid: string,
+    threat: number,
+    photo: string,
     _created: Date
   }[],
-  authors: Array<string>;
+  users: Array<string>;
 }
 
-export default class AllBlogs extends React.Component<IHomeProps, IHomeState> {
+export default class AllFires extends React.Component<IHomeProps, IHomeState> {
   static navigationOptions: NavigationScreenOptions = {
-    headerTitle: "Blogs"
+    headerTitle: "Fires"
   };
 
   constructor(props: IHomeProps) {
     super(props);
     this.state = {
-      blogs: [],
-      authors: []
+      fires: [],
+      users: []
     }
-    this._getBlogs();
+    this._getFires();
   }
 
-  async _getBlogs() {
+  async _getFires() {
     try {
-      let blogs = await json('https://afternoon-basin-48933.herokuapp.com/api/blogs'); 
-      this.setState({blogs})
+      let fires = await json('https://report-wildfire-app.herokuapp.com/api/fires'); 
+      console.log(fires);
+      this.setState({fires})
 
       // set author names from db
-      this._setAuthors();
+      this._setUsers();
 
     } catch (e) {
       console.log(e);
@@ -45,23 +48,23 @@ export default class AllBlogs extends React.Component<IHomeProps, IHomeState> {
     }
   }
 
-    async _setAuthors() {
+    async _setUsers() {
       try {
-        let authors: Array<string> = [];
-        for (let blog of this.state.blogs) {
-          let author = await json('https://afternoon-basin-48933.herokuapp.com/api/authors/name/' + blog.authorid); 
-          authors.push(author[0]['name']);
+        let users: Array<string> = [];
+        for (let fire of this.state.fires) {
+          let u = await json('https://report-wildfire-app.herokuapp.com/api/users/' + fire.userid); 
+          users.push(u[0]['name']);
         }
-        this.setState({authors});
+        this.setState({users});
     } catch (e) {
       console.log(e); 
     }
   }
 
-  renderBlogs() {
-    return this.state.blogs.map((blog, index) => { 
-      if (this.state.authors[index]) {
-        return <BlogPreviewCard key={blog.id} blog={blog} authorname={this.state.authors[index]} />
+  renderFires() {
+    return this.state.fires.map((fire, index) => { 
+      if (this.state.users[index]) {
+        return <FirePreviewCard key={fire.id} fire={fire} authorname={this.state.users[index]} />
       }
     });
   }
@@ -69,10 +72,10 @@ export default class AllBlogs extends React.Component<IHomeProps, IHomeState> {
   render () { 
     return (
       <View style={styles.container}>
-        <NavigationEvents onDidFocus={() => this._getBlogs()} />
-        <Text style={styles.text}>All Blogs Screen</Text>
+        <NavigationEvents onDidFocus={() => this._getFires()} />
+        <Text style={styles.text}>Current Fires</Text>
           <ScrollView style={{width: '90%'}}>
-            {this.renderBlogs()}
+            {this.renderFires()}
           </ScrollView>
         
       </View>

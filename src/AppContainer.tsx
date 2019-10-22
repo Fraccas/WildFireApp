@@ -3,11 +3,15 @@ import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { Icon } from 'react-native-elements';
 import { createStackNavigator } from 'react-navigation-stack';
-import AllBlogs  from './screens/AllBlogs';
-import SingleBlog from './screens/SingleBlog';
-import Login from './screens/Login';
+
+import Fires  from './screens/AllFires';
+import AddFire from './screens/AddFire';
+
 import AuthLoading from './screens/AuthLoading';
-import AddBlog from './screens/AddBlog';
+import Login from './screens/Login';
+import Logout from './screens/Login';
+
+
 
 const AuthStack = createStackNavigator({
     // screens
@@ -16,35 +20,36 @@ const AuthStack = createStackNavigator({
 
 const AppStack = createStackNavigator({
     // screens
-    AllBlogs,
-    SingleBlog
+    Fires,
+    AddFire,
+    Logout
 }, {
     // generic styling
-    initialRouteName: 'AllBlogs',
+    initialRouteName: 'Fires',
     defaultNavigationOptions: {
         headerStyle: {
-            backgroundColor: '#43005B'
+            backgroundColor: '#ffbf00'
         },
-        headerTintColor: '#fff',
+        headerTintColor: '#36454f',
         headerTitleStyle: {
             fontWeight: 'bold'
         }
     }
 });
 
-const BlogsTab = createBottomTabNavigator(
+const FiresTab = createBottomTabNavigator(
     {
-        Blogs: AppStack,
-        AddBlog: createStackNavigator(
+        Fires: AppStack,
+        AddFire: createStackNavigator(
             {
-                AddBlog
+                AddFire
             }, 
             {
                 defaultNavigationOptions: {
                     headerStyle: {
-                        backgroundColor: '#43005B'
+                        backgroundColor: '#ffbf00'
                     },
-                    headerTintColor: '#fff',
+                    headerTintColor: '#36454f',
                     headerTitleStyle: {
                         fontWeight: 'bold'
                     }
@@ -53,14 +58,14 @@ const BlogsTab = createBottomTabNavigator(
         )
     },
     {
-        initialRouteName: 'Blogs',
+        initialRouteName: 'Fires',
         defaultNavigationOptions: ({ navigation }) => ({
             tabBarIcon: ({ tintColor}) => {
                 let { routeName } = navigation.state;
                 let iconName;
-                if (routeName === 'Blogs') {
+                if (routeName === 'Fires') {
                     iconName = 'rss';
-                } else if (routeName === 'AddBlog') {
+                } else if (routeName === 'AddFire') {
                     iconName = 'edit';
                 }
 
@@ -75,17 +80,17 @@ const BlogsTab = createBottomTabNavigator(
             }
         }),
         tabBarOptions: {
-            activeBackgroundColor: '#43005B',
-            inactiveBackgroundColor: '#43005B',
+            activeBackgroundColor: '#ffbf00',
+            inactiveBackgroundColor: '#ffbf00',
             activeTintColor: 'white',
-            inactiveTintColor: 'gray'
+            inactiveTintColor: '#36454f'
         }
     }
 );
 
 export default createAppContainer(createSwitchNavigator(
     {
-        App: BlogsTab,
+        App: FiresTab,
         Auth: AuthStack,
         AuthLoading
     }, 

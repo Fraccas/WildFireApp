@@ -9,4 +9,6 @@ Setup backend code using Node on Heroku
 
 Setup front using React Native and Expo
 -register/login
+-logout
 -report fire/view fires
+-inciweb API (https://inciweb.nwcg.gov/feeds/rss/incidents/)
