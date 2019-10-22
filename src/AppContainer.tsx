@@ -4,28 +4,40 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { Icon } from 'react-native-elements';
 import { createStackNavigator } from 'react-navigation-stack';
 
-import Fires  from './screens/AllFires';
+import AllFires  from './screens/AllFires';
 import AddFire from './screens/AddFire';
 
 import AuthLoading from './screens/AuthLoading';
 import Login from './screens/Login';
-import Logout from './screens/Login';
+import Settings from './screens/Settings';
 
 
 
 const AuthStack = createStackNavigator({
     // screens
     Login
+}, {
+    // generic styling
+    initialRouteName: 'Login',
+    defaultNavigationOptions: {
+        headerStyle: {
+            backgroundColor: '#ffbf00'
+        },
+        headerTintColor: '#36454f',
+        headerTitleStyle: {
+            fontWeight: 'bold'
+        }
+    }
 });
 
 const AppStack = createStackNavigator({
     // screens
-    Fires,
+    AllFires,
     AddFire,
-    Logout
+    Settings
 }, {
     // generic styling
-    initialRouteName: 'Fires',
+    initialRouteName: 'AllFires',
     defaultNavigationOptions: {
         headerStyle: {
             backgroundColor: '#ffbf00'
@@ -55,7 +67,23 @@ const FiresTab = createBottomTabNavigator(
                     }
                 }
             }
-        )
+        ),
+        Settings: createStackNavigator(
+            {
+                Settings
+            }, 
+            {
+                defaultNavigationOptions: {
+                    headerStyle: {
+                        backgroundColor: '#ffbf00'
+                    },
+                    headerTintColor: '#36454f',
+                    headerTitleStyle: {
+                        fontWeight: 'bold'
+                    }
+                }
+            }
+        ),
     },
     {
         initialRouteName: 'Fires',
@@ -64,9 +92,11 @@ const FiresTab = createBottomTabNavigator(
                 let { routeName } = navigation.state;
                 let iconName;
                 if (routeName === 'Fires') {
-                    iconName = 'rss';
+                    iconName = 'fire';
                 } else if (routeName === 'AddFire') {
                     iconName = 'edit';
+                } else if (routeName == 'Settings') {
+                    iconName = 'cog';
                 }
 
                 return (

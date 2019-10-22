@@ -2,7 +2,7 @@ import * as React from 'react';
 import {
     ActivityIndicator, StatusBar, View, AsyncStorage
 } from 'react-native';
-import { getAccessToken } from '../utils/api';
+import { GetAccessToken } from '../utils/api';
 import { NavigationStackScreenProps } from 'react-navigation-stack';
 
 interface Props extends NavigationStackScreenProps {}
@@ -17,7 +17,7 @@ export default class AuthLoading extends React.Component<Props, State> {
 
     async _accessToken() {
         try {
-            let token = await getAccessToken();
+            let token = await GetAccessToken();
             this.props.navigation.navigate(token ? 'App' : 'Auth')
         } catch (e) {
             console.log(e);

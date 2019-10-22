@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { StyleSheet, View, Alert } from 'react-native';
+import { StyleSheet, View, Alert, AsyncStorage } from 'react-native';
 import { Input, Text, Button } from 'react-native-elements';
 import { NavigationStackScreenProps } from 'react-navigation-stack';
 import { NavigationScreenOptions } from 'react-navigation';
-import { json, SetAccessToken, getUser } from '../utils/api';
+import { json, SetAccessToken, GetUser, SetEmail } from '../utils/api';
 
 interface Props extends NavigationStackScreenProps {}
 interface State {
@@ -25,24 +25,25 @@ export default class Login extends React.Component<Props, State> {
     }
 
     async componentDidMount() {
-        let user = await getUser();
+        let user = await GetUser();
         if (user && user.role) {
-            this.props.navigation.navigate('AllBlogs');
+            this.props.navigation.navigate('AllFires');
         }
     }
 
     async handleLogin () {
         try {
-            let result = await json('https://afternoon-basin-48933.herokuapp.com/auth/login', 'POST', {
+            let result = await json('https://report-wildfire-app.herokuapp.com/auth/login', 'POST', {
                 email: this.state.email,
                 password: this.state.password
             });
 
             if (result) {
-                await SetAccessToken(result.token, {userid: result.userid, role: result.role});
-                let user = await getUser();
+                await SetAccessToken(result.token, {userid: result.userid, name: result.name, role: result.role, phone: result.phone});
+                let user = await GetUser();
                 if (user && user.role) {
-                    this.props.navigation.navigate('AllBlogs');
+                    SetEmail(this.state.email);
+                    this.props.navigation.navigate('AllFires');
                 } else {
                     Alert.alert('Invalid login information!');
                 }
@@ -55,29 +56,33 @@ export default class Login extends React.Component<Props, State> {
         }
     }
 
-    async handleRegister () {
-        try {
-            let result = await json('https://afternoon-basin-48933.herokuapp.com/auth/register', 'POST', {
-                name: this.state.email,
-                email: this.state.email,
-                password: this.state.password
-            });
+    // async handleRegister () {
+    //     try {
+    //         let result = await json('https://report-wildfire-app.herokuapp.com/auth/register', 'POST', {
+    //             name: this.state.email,
+    //             email: this.state.email,
+    //             password: this.state.password
+    //         });
 
-            if (result) {
-                await SetAccessToken(result.token, {userid: result.userid, role: result.role});
-                let user = await getUser();
-                if (user && user.role) {
-                    this.props.navigation.navigate('AllBlogs');
-                } else {
-                    Alert.alert('Invalid user information!');
-                }
-            } else {
-                Alert.alert('Invalid user information!');
-            }
-        } catch(e) {
-            console.log(e);
-            Alert.alert("Problem registering? Contact your admin!");
-        }
+    //         if (result) {
+    //             await SetAccessToken(result.token, {userid: result.userid, name: result.name, role: result.role, phone: result.phone});
+    //             let user = await getUser();
+    //             if (user && user.role) {
+    //                 this.props.navigation.navigate('AllFires');
+    //             } else {
+    //                 Alert.alert('Invalid user information!');
+    //             }
+    //         } else {
+    //             Alert.alert('Invalid user information!');
+    //         }
+    //     } catch(e) {
+    //         console.log(e);
+    //         Alert.alert("Problem registering? Contact your admin!");
+    //     }
+    //}
+
+    sendRegister() {
+        this.props.navigation.navigate('Register');
     }
 
     render() {
@@ -107,15 +112,15 @@ export default class Login extends React.Component<Props, State> {
                         raised
                         title="Login"
                         containerStyle={{margin: 10}}
-                        buttonStyle={{backgroundColor: '#AE3CD7'}}
+                        buttonStyle={{backgroundColor: '#36454f'}}
                         onPress={() => this.handleLogin()}
                     />
                     <Button 
                         raised
-                        title="Register"
+                        title="Create Account"
                         containerStyle={{margin: 10}}
-                        buttonStyle={{backgroundColor: '#AE3CD7'}}
-                        onPress={() => this.handleRegister()}
+                        buttonStyle={{backgroundColor: '#36454f'}}
+                        onPress={() => this.sendRegister()}
                     />
                 </View>
             </View>

@@ -3,16 +3,14 @@ import { StyleSheet, View, Alert, Picker, ScrollView } from 'react-native';
 import { NavigationStackScreenProps } from 'react-navigation-stack';
 import { NavigationScreenOptions } from 'react-navigation';
 import { Input, Button, Text } from 'react-native-elements';
-import { getUser, json } from '../utils/api';
+import { GetUser, json } from '../utils/api';
 
 interface Props extends NavigationStackScreenProps {}
 interface State {
     lat: number,
     lon: number,
     userid: number,
-    threat: number,
     photo: string,
-    _created: number,
     threatList: string[],
     selectedThreat: string
 }
@@ -29,41 +27,44 @@ export default class AddFire extends React.Component<Props, State> {
             lat: 0,
             lon: 0,
             userid: 0,
-            threat: 0,
             photo: 'NA',
-            _created: Date.now(),
             threatList: ['Low', 'Moderate', 'High', 'Severe'],
             selectedThreat: 'Low'
         };
+
+        // get gps location on load
+        navigator.geolocation.getCurrentPosition(this.getPosition);
     }
 
     private saving: boolean = false;
+
+    getPosition = (position: any) => {
+        this.setState({lat : position.coords.latitude});
+        this.setState({lon : position.coords.longitude});
+    }
 
 
     async handleSubmit() {
         if (this.saving) return; // already clicked, don't rerun logic
 
-        if (!this.state.threat) {
+        if (!this.state.selectedThreat) {
             Alert.alert("Please fill out all inputs!");
             return;
         }
 
-        // get gps location
-
-        let { userid } = await getUser();
+        let { userid } = await GetUser();
         let newFire = {
-            lat: 0,
-            lon: 0,
+            lat: this.state.lat,
+            lon: this.state.lon,
             userid: userid,
-            threat: this.state.threat,
-            photo: this.state.photo,
-            _created: Date.now()
+            threat: this.state.selectedThreat,
+            photo: this.state.photo
         }
 
         try {
             this.saving = true;
 
-            let result = await json(`https://afternoon-basin-48933.herokuapp.com/api/fires/post`, 'POST', newFire);
+            let result = await json(`https://report-wildfire-app.herokuapp.com/api/fires/new`, 'POST', newFire);
             
             if (result) {
                 // wipe state
@@ -71,9 +72,8 @@ export default class AddFire extends React.Component<Props, State> {
                     lat: 0,
                     lon: 0,
                     userid: 0,
-                    threat: 0,
-                    photo: 'NA',
-                    _created: Date.now()
+                    selectedThreat: 'Low',
+                    photo: 'NA'
                 });
                 this.props.navigation.navigate('AllFires');
             }
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Cochin'
       },
       buttonStyle: {
-          backgroundColor: '#AE3CD7',
+          backgroundColor: '#36454f',
           borderWidth: 2,
           borderColor: '#43005B',
           width: '100%'

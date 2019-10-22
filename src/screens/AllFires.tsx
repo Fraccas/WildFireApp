@@ -12,7 +12,7 @@ interface IHomeState {
     lat: number,
     lon: number,
     userid: string,
-    threat: number,
+    threat: string,
     photo: string,
     _created: Date
   }[],
@@ -33,10 +33,11 @@ export default class AllFires extends React.Component<IHomeProps, IHomeState> {
     this._getFires();
   }
 
+  
+
   async _getFires() {
     try {
       let fires = await json('https://report-wildfire-app.herokuapp.com/api/fires'); 
-      console.log(fires);
       this.setState({fires})
 
       // set author names from db
@@ -62,6 +63,7 @@ export default class AllFires extends React.Component<IHomeProps, IHomeState> {
   }
 
   renderFires() {
+    let count = 0;
     return this.state.fires.map((fire, index) => { 
       if (this.state.users[index]) {
         return <FirePreviewCard key={fire.id} fire={fire} authorname={this.state.users[index]} />

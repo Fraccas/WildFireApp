@@ -35,13 +35,15 @@ class FirePreviewCard extends React.Component<Props, State> {
     }
 
     getLocation = async () => {
-        let response = await fetch('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + this.props.fire.lat + ',' + this.props.fire.lon + '&sensor=true&key=AIzaSyBUYqKYsO5Cy6VtsMYmlSm_YOVL3OFhr3k'); 
-        const location = await response.json();
-        console.log(location);
-        this.setState({locationText: location['plus_code']['compound_code']});
+        if (this.props.fire.lat) {
+            let response = await fetch('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + this.props.fire.lat + ',' + this.props.fire.lon + '&sensor=true&key=AIzaSyBUYqKYsO5Cy6VtsMYmlSm_YOVL3OFhr3k'); 
+            const location = await response.json();
+            let locationText = location['plus_code']['compound_code'].substring(8);
+            this.setState({locationText});
+        }
     }
 
-    render () {
+    render () {   
         if (this.state.locationText != "NA") {
             const { id } = this.props.fire;
             let authorname = this.props.authorname;
@@ -63,9 +65,7 @@ class FirePreviewCard extends React.Component<Props, State> {
                 </Card>
             );
         } else {
-            return (
-                <Text style={{marginBottom: 10}}>{`Loading Fire Data...`}</Text>
-            );
+            return null;  
         }
     }
 }
