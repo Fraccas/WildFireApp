@@ -38,7 +38,7 @@ class FirePreviewCard extends React.Component<Props, State> {
         if (this.props.fire.lat) {
             try {
 
-                let key = await json('https://report-wildfire-app.herokuapp.com/api/tokens/gmap/key');
+                let key = await json('https://report-wildfire-app.herokuapp.com/api/users/gmap/key');
                 console.log(key);
 
                 let response = await fetch('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + this.props.fire.lat + ',' + this.props.fire.lon + '&sensor=true&key=' + key); 

@@ -5,6 +5,7 @@ Setup database on heroku using ClearDB MySQL (Complete)
 
 Setup backend code using Node on Heroku
 -routes
+-setup gmap api (need protect)
 -mailgun API
 
 Setup front using React Native and Expo

@@ -49,7 +49,7 @@ export default class AllFires extends React.Component<IHomeProps, IHomeState> {
     }
   }
 
-    async _setUsers() {
+    async _setUsers() { 
       try {
         let users: Array<string> = [];
         for (let fire of this.state.fires) {
