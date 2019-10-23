@@ -36,10 +36,20 @@ class FirePreviewCard extends React.Component<Props, State> {
 
     getLocation = async () => {
         if (this.props.fire.lat) {
-            let response = await fetch('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + this.props.fire.lat + ',' + this.props.fire.lon + '&sensor=true&key=AIzaSyBUYqKYsO5Cy6VtsMYmlSm_YOVL3OFhr3k'); 
-            const location = await response.json();
-            let locationText = location['plus_code']['compound_code'].substring(8);
-            this.setState({locationText});
+            try {
+
+                let key = await json('https://report-wildfire-app.herokuapp.com/api/tokens/gmap/key');
+                console.log(key);
+
+                let response = await fetch('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + this.props.fire.lat + ',' + this.props.fire.lon + '&sensor=true&key=' + key); 
+                const location = await response.json();
+                
+                let locationText = location['plus_code']['compound_code'].substring(8);
+                this.setState({locationText});
+            } catch (e) {
+                console.log('error getting phones gps location');
+                throw e;
+            }
         }
     }
 
