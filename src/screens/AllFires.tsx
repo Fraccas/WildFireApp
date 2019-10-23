@@ -4,6 +4,7 @@ import { NavigationStackScreenProps } from 'react-navigation-stack';
 import { NavigationScreenOptions, NavigationEvents } from 'react-navigation';
 import { json } from '../utils/api';
 import FirePreviewCard from '../components/FirePreviewCard';
+import { getDistance } from 'geolib';
 
 interface IHomeProps extends NavigationStackScreenProps { }
 interface IHomeState {
@@ -14,10 +15,14 @@ interface IHomeState {
     userid: string,
     threat: string,
     photo: string,
-    _created: Date
+    _created: Date,
+    distanceFromUser: number
   }[],
-  users: Array<string>;
+  users: Array<string>
 }
+
+let myLat: number;
+let myLon: number;
 
 export default class AllFires extends React.Component<IHomeProps, IHomeState> {
   static navigationOptions: NavigationScreenOptions = {
@@ -31,13 +36,28 @@ export default class AllFires extends React.Component<IHomeProps, IHomeState> {
       users: []
     }
     this._getFires();
+    navigator.geolocation.getCurrentPosition(this.getPosition); // set gps coords
   }
 
-  
+  // sets gps coords
+  getPosition = (position: any) => {
+    myLat = position.coords.latitude;
+    myLon = position.coords.longitude;
+  }
 
   async _getFires() {
     try {
       let fires = await json('https://report-wildfire-app.herokuapp.com/api/fires'); 
+
+      fires.forEach(async function (fire: any) {     
+          const dist = getDistance(
+            { latitude: fire.lat, longitude: fire.lon },
+            { latitude: myLat, longitude: myLon }
+          );
+          // save dist in miles
+          fire.distanceFromUser = Math.round((dist*0.000621) * 100) / 100;
+      });
+
       this.setState({fires})
 
       // set author names from db
@@ -75,7 +95,7 @@ export default class AllFires extends React.Component<IHomeProps, IHomeState> {
     return (
       <View style={styles.container}>
         <NavigationEvents onDidFocus={() => this._getFires()} />
-        <Text style={styles.text}>Current Fires</Text>
+        <Text style={styles.text}>Current Fires Near You</Text>
           <ScrollView style={{width: '90%'}}>
             {this.renderFires()}
           </ScrollView>

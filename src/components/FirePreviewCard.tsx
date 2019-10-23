@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Text, Card, Button, Icon } from 'react-native-elements';
 import { NavigationInjectedProps, withNavigation } from 'react-navigation';
-import { json } from '../utils/api';
+import { getLocationText } from '../utils/map';
 
 interface Props extends NavigationInjectedProps {
     fire: {
@@ -11,7 +11,8 @@ interface Props extends NavigationInjectedProps {
         userid: string,
         threat: string,
         photo: string,
-        _created: Date
+        _created: Date,
+        distanceFromUser: number
     },
     authorname: string,
     
@@ -29,28 +30,10 @@ class FirePreviewCard extends React.Component<Props, State> {
         }
       }
 
-    componentDidMount() {
-        this.getLocation();
+    async componentDidMount() {
+        let locText:string = await getLocationText(this.props.fire.lat, this.props.fire.lon) as string;
+        this.setState({locationText: locText});
 
-    }
-
-    getLocation = async () => {
-        if (this.props.fire.lat) {
-            try {
-
-                let key = await json('https://report-wildfire-app.herokuapp.com/api/users/gmap/key');
-                console.log(key);
-
-                let response = await fetch('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + this.props.fire.lat + ',' + this.props.fire.lon + '&sensor=true&key=' + key); 
-                const location = await response.json();
-                
-                let locationText = location['plus_code']['compound_code'].substring(8);
-                this.setState({locationText});
-            } catch (e) {
-                console.log('error getting phones gps location');
-                throw e;
-            }
-        }
     }
 
     render () {   
@@ -63,6 +46,7 @@ class FirePreviewCard extends React.Component<Props, State> {
                     image={{uri: 'https://images.newscientist.com/wp-content/uploads/2018/08/08114243/rexfeatures_9778243j.jpg'}}
                 >
                     <Text style={{marginBottom: 10}}>{`Reported by ${authorname}`}</Text>
+                    <Text style={{marginBottom: 10}}>{`Distance from you: ${this.props.fire.distanceFromUser} miles`}</Text>
                     <Text style={{marginBottom: 10}}>{`Located in ${this.state.locationText}`}</Text>
                     <Button
                         icon={<Icon name='code' color='#ffffff' />}
