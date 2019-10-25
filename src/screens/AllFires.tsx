@@ -62,11 +62,11 @@ export default class AllFires extends React.Component<IHomeProps, IHomeState> {
   }
 
   componentDidMount() {
-    //this._getFires();
-    this._getApiFires();
-
     // set current gps coords from phone on load
     navigator.geolocation.getCurrentPosition(this.getPosition);
+
+    //this._getFires(); 
+    this._getApiFires();
   }
 
   // sets gps coords
@@ -85,26 +85,28 @@ export default class AllFires extends React.Component<IHomeProps, IHomeState> {
             if (result) {
               let jsonFire: any = JSON.stringify(result); // convert xml to json text
               jsonFire = JSON.parse(jsonFire); // convert json text to json obj
-              apifires = jsonFire['rss']['channel'][0]['item']; // array of all fires
+              if (jsonFire)
+                apifires = jsonFire['rss']['channel'][0]['item']; // array of all fires
             }
           });
 
-          // set lat/long object properties and get distance from user
-          // if (apifires.length > 0) {
-          //   apifires.forEach(function (fire: any) {
-              // fire.lat = parseFloat(fire['geo:lat'][0]);
-              // fire.lon = parseFloat(fire['geo:lon'][0]);
-              // let lat = parseFloat(fire['geo:lat'][0]); 
-              // let lon = parseFloat(fire['geo:lon'][0]);
+          //set lat/long object properties and get distance from user
+          if (apifires.length > 0) {
+            apifires.forEach(function (fire: any) {
+              let lat = Number(fire['geo:lat']); 
+              let lon = Number(fire['geo:long']);
+              fire.lat = lat;
+              fire.lon = lon;
 
-              // const dist = getDistance(
-              //   { latitude: lat, longitude: lon },
-              //   { latitude: myLat, longitude: myLon }
-              // );
+              const dist = getDistance(
+                { latitude: lat, longitude: lon },
+                { latitude: myLat, longitude: myLon }
+              );
+
               // // save dist in miles
-              // fire.distanceFromUser = Math.round((dist*0.000621) * 100) / 100;
-          //   });
-          // }    
+              fire.distanceFromUser = Math.round((dist*0.000621) * 100) / 100;
+            });
+          }    
           this.setState({ apiFires: apifires });
         })
         .catch((err) => {
@@ -120,7 +122,6 @@ export default class AllFires extends React.Component<IHomeProps, IHomeState> {
   //     let fires = await json('https://report-wildfire-app.herokuapp.com/api/fires'); 
 
   //     fires.forEach(async function (fire: any) {     
-
   //         const dist = getDistance(
   //           { latitude: fire.lat, longitude: fire.lon },
   //           { latitude: myLat, longitude: myLon }
