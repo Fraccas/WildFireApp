@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { StyleSheet, Text, View, Alert, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { Button, Icon } from 'react-native-elements';
 import { NavigationStackScreenProps } from 'react-navigation-stack';
 import { NavigationScreenOptions, NavigationEvents } from 'react-navigation';
 import ApiFirePreviewCard from '../components/ApiFirePreviewCard';
@@ -16,7 +17,8 @@ interface apiFire {
   link: string,
   lat: number,
   lon: number,
-  distanceFromUser: number
+  distanceFromUser: number,
+  discription: string
 }[]
 interface IHomeProps extends NavigationStackScreenProps { }
 interface IHomeState {
@@ -27,7 +29,8 @@ interface IHomeState {
     link: string,
     lat: number,
     lon: number,
-    distanceFromUser: number
+    distanceFromUser: number,
+    discription: string
   }[]
 }
 
@@ -77,6 +80,7 @@ export default class AllFires extends React.Component<IHomeProps, IHomeState> {
           //set lat/long object properties and get distance from user
           if (apifires.length > 0) {
             apifires.forEach(function (fire: any) {
+              fire.link = fire.link[0];
               let lat = Number(fire['geo:lat']); 
               let lon = Number(fire['geo:long']);
               fire.lat = lat;
@@ -91,6 +95,9 @@ export default class AllFires extends React.Component<IHomeProps, IHomeState> {
               fire.distanceFromUser = Math.round((dist*0.000621) * 100) / 100;
             });
           }    
+
+          apifires.sort((a:apiFire, b:apiFire) => (a.distanceFromUser > b.distanceFromUser) ? 1 : -1);
+
           this.setState({ apiFires: apifires });
         })
         .catch((err) => {
@@ -114,6 +121,12 @@ export default class AllFires extends React.Component<IHomeProps, IHomeState> {
         <View style={styles.container}>
           { <NavigationEvents onDidFocus={() => this._getApiFires()} /> } 
           <Text style={styles.text}>{this.state.apiFires.length} Fires Found</Text>
+          <Button
+              icon={<Icon name='map' color='#ffffff' />}
+              buttonStyle={{ backgroundColor: '#36454f', width: '100%', borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 4, marginTop: 0 }}
+              title='  View Fires on Map'
+              onPress={() => this.props.navigation.navigate('FireMap')}
+          />
           <ScrollView style={{ width: '90%' }}>
             {this.renderApiFires()}
           </ScrollView>

@@ -11,7 +11,8 @@ interface Props extends NavigationInjectedProps {
         link: string,
         lat: number,
         lon: number,
-        distanceFromUser: number
+        distanceFromUser: number,
+        discription: string
     }
     
 }
@@ -46,11 +47,11 @@ class ApiFirePreviewCard extends React.Component<Props, State> {
                     <Text style={{marginBottom: 10}}>{`Located in ${this.state.locationText}`}</Text>
                     <Text style={{marginBottom: 10}}>{`${this.props.apifire.published}`}</Text>
                     <Button
-                        icon={<Icon name='code' color='#ffffff' />}
+                        icon={<Icon name='info' color='#ffffff' />}
                         buttonStyle={{ backgroundColor: '#36454f', borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0, marginTop: 0 }}
                         title=' View this Fire'
                         onPress={() => this.props.navigation.navigate('SingleFire', {
-                            itemId: id
+                            apiFire: this.props.apifire
                         })}
                     />
                 </Card>

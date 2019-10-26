@@ -5,6 +5,7 @@ import { Icon } from 'react-native-elements';
 import { createStackNavigator } from 'react-navigation-stack';
 
 import AllFires  from './screens/AllFires';
+import SingleFire  from './screens/SingleFire';
 import AddFire from './screens/AddFire';
 
 import AuthLoading from './screens/AuthLoading';
@@ -33,6 +34,7 @@ const AuthStack = createStackNavigator({
 const AppStack = createStackNavigator({
     // screens
     AllFires,
+    SingleFire,
     AddFire,
     Settings
 }, {

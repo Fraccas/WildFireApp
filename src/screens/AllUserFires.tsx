@@ -4,7 +4,6 @@ import { NavigationStackScreenProps } from 'react-navigation-stack';
 import { NavigationScreenOptions, NavigationEvents } from 'react-navigation';
 import { json } from '../utils/api';
 import FirePreviewCard from '../components/FirePreviewCard';
-import ApiFirePreviewCard from '../components/ApiFirePreviewCard';
 
 
 // external libs
