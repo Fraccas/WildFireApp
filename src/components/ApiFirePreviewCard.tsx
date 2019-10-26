@@ -32,7 +32,6 @@ class ApiFirePreviewCard extends React.Component<Props, State> {
     async componentDidMount() {
         let locText:string = await getLocationText(this.props.apifire.lat, this.props.apifire.lon) as string;
         this.setState({locationText: locText});
-
     }
 
     render () {   
@@ -49,9 +48,9 @@ class ApiFirePreviewCard extends React.Component<Props, State> {
                     <Button
                         icon={<Icon name='info' color='#ffffff' />}
                         buttonStyle={{ backgroundColor: '#36454f', borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0, marginTop: 0 }}
-                        title=' View this Fire'
+                        title=' View More Info'
                         onPress={() => this.props.navigation.navigate('SingleFire', {
-                            apiFire: this.props.apifire
+                            apiFire: this.props.apifire, location: this.state.locationText,
                         })}
                     />
                 </Card>

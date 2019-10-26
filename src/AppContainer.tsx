@@ -6,7 +6,7 @@ import { createStackNavigator } from 'react-navigation-stack';
 
 import AllFires  from './screens/AllFires';
 import SingleFire  from './screens/SingleFire';
-import AddFire from './screens/AddFire';
+import ReportFire from './screens/ReportFire';
 import MapFireView from './screens/MapFireView';
 
 import AuthLoading from './screens/AuthLoading';
@@ -37,11 +37,11 @@ const AppStack = createStackNavigator({
     AllFires,
     SingleFire,
     MapFireView,
-    AddFire,
+    ReportFire,
     Settings
 }, {
     // generic styling
-    initialRouteName: 'AllFires',
+    initialRouteName: 'MapFireView',
     defaultNavigationOptions: {
         headerStyle: {
             backgroundColor: '#ffbf00'
@@ -56,9 +56,9 @@ const AppStack = createStackNavigator({
 const FiresTab = createBottomTabNavigator(
     {
         Fires: AppStack,
-        AddFire: createStackNavigator(
+        ReportFire: createStackNavigator(
             {
-                AddFire
+                ReportFire
             }, 
             {
                 defaultNavigationOptions: {
@@ -97,7 +97,7 @@ const FiresTab = createBottomTabNavigator(
                 let iconName;
                 if (routeName === 'Fires') {
                     iconName = 'fire';
-                } else if (routeName === 'AddFire') {
+                } else if (routeName === 'ReportFire') {
                     iconName = 'edit';
                 } else if (routeName == 'Settings') {
                     iconName = 'cog';

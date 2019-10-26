@@ -15,7 +15,7 @@ interface State {
     selectedThreat: string
 }
 
-export default class AddFire extends React.Component<Props, State> {
+export default class ReportFire extends React.Component<Props, State> {
     static navigationOptions: NavigationScreenOptions = {
         headerTitle: "Report Fire"
     };

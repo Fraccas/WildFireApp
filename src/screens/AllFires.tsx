@@ -118,20 +118,25 @@ export default class AllFires extends React.Component<IHomeProps, IHomeState> {
   render() {
     if (this.state.apiFires.length > 0) {
       return (
-        <View style={styles.container}>
-          { <NavigationEvents onDidFocus={() => this._getApiFires()} /> } 
-          <Text style={styles.text}>{this.state.apiFires.length} Fires Found</Text>
+        <>
+        <View style={{width:'100%'}}>
           <Button
               icon={<Icon name='map' color='#ffffff' />}
-              buttonStyle={{ backgroundColor: '#36454f', width: '100%', borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 4, marginTop: 0 }}
+              buttonStyle={{ backgroundColor: '#36454f', alignSelf: 'stretch', width: '100%', borderRadius: 1, marginLeft: 0, marginRight: 0, marginBottom: 3, marginTop: 0 }}
               title='  View Fires on Map'
               onPress={() => this.props.navigation.navigate('MapFireView')}
           />
-          <ScrollView style={{ width: '90%' }}>
+        </View>
+        <View style={styles.container}>
+          
+          { <NavigationEvents onDidFocus={() => this._getApiFires()} /> } 
+          <Text style={styles.text}>{this.state.apiFires.length} Fires Found</Text>
+          <ScrollView style={{ width: '95%' }}>
             {this.renderApiFires()}
           </ScrollView>
 
         </View>
+        </>
       );
     } else {
       return (<Text style={styles.text}>Loading fire data...</Text>);
@@ -142,6 +147,7 @@ export default class AllFires extends React.Component<IHomeProps, IHomeState> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
     backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center'

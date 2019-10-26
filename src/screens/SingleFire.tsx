@@ -14,10 +14,11 @@ interface State {
         lon: number,
         distanceFromUser: number,
         description: string
-    }
+    },
+    location: string
 }
 
-export default class SingleBlog extends React.Component<Props, State> {
+export default class SingleFire extends React.Component<Props, State> {
 
     static navigationOptions: NavigationScreenOptions = {
         headerTitle: 'Fire Data'
@@ -26,7 +27,8 @@ export default class SingleBlog extends React.Component<Props, State> {
     constructor(props: Props) {
       super(props);
       this.state = {
-        apiFire: {id: '', title: '', published: '', link: '', lat: 0, lon: 0, distanceFromUser: 0, description: ''}
+        apiFire: {id: '', title: '', published: '', link: '', lat: 0, lon: 0, distanceFromUser: 0, description: ''},
+        location: ''
       };
     }
 
@@ -34,6 +36,8 @@ export default class SingleBlog extends React.Component<Props, State> {
       try {
         const fire = this.props.navigation.getParam('apiFire', 'NO-FIRE');
         this.setState({apiFire: fire});
+        const location = this.props.navigation.getParam('location', 'NO-LOCATION');
+        this.setState({location});
       } catch (e) {
         console.log(e);
         Alert.alert("Error on grabbing fire parm!");
@@ -46,11 +50,13 @@ export default class SingleBlog extends React.Component<Props, State> {
         
           <View style={styles.container}>
             <Text style={styles.titleStyle}>{title}</Text>
-            <Text style={styles.tagStyle}>{distanceFromUser} miles away</Text>
+            <Text style={styles.tagStyle}>{this.state.location}</Text>
             <ScrollView>
             <View style={styles.container}>
+            <Text style={styles.altText}>{distanceFromUser} MILES FROM YOUR LOCATION</Text>
                 <Text style={styles.bodyTextStyle}>{description}</Text>
-                <Text style={styles.date}>Fire Published: {published}</Text>
+                <Text style={styles.altText}>Fire Published: {published}</Text>               
+
                 <Button 
                     buttonStyle={{ backgroundColor: '#36454f', borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 5, marginTop: 5 }}
                     title="View More" 
@@ -75,10 +81,10 @@ const styles = StyleSheet.create({
     borderStyle: 'solid'
   },
   titleStyle: {
-    marginTop: 15,
+    marginTop: 5,
     textAlign: 'center',
     color: 'black',
-    fontSize: 35
+    fontSize: 30
   },
   tagStyle: {
     margin: 15,
@@ -103,11 +109,12 @@ const styles = StyleSheet.create({
     fontSize: 17,
     lineHeight: 25
   },
-  date: {
-      color: 'black',
+  altText: {
+    color: 'black',
       marginTop: 15,
       marginBottom: 15,
       fontSize: 15,
-      fontWeight: 'bold'
+      fontWeight: 'bold',
+      textAlign: 'center'
   }
 });

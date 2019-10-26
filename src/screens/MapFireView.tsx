@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import { Button, Icon } from 'react-native-elements';
+import { StyleSheet, Text } from 'react-native';
+import { Button} from 'react-native-elements';
 import { NavigationStackScreenProps } from 'react-navigation-stack';
 import { NavigationScreenOptions, NavigationEvents } from 'react-navigation';
+import { getLocationText } from '../utils/map';
 
 import ApiFirePreviewCard from '../components/ApiFirePreviewCard';
 import MapView from 'react-native-maps';
@@ -42,7 +43,8 @@ interface IHomeState {
     coordinate : {
       latitude: number,
       longitude: number
-    }
+    },
+    location: string
   }[],
   region: {
       latitude: number,
@@ -57,14 +59,14 @@ let myLon: number;
 
 export default class MapFireView extends React.Component<IHomeProps, IHomeState> {
   static navigationOptions: NavigationScreenOptions = {
-    headerTitle: "Map View"
+    headerTitle: "Fires in the US"
   };
 
   constructor(props: IHomeProps) {
     super(props);
     this.state = {
       apiFires: [],
-      region: {latitude: 0, longitude: 0, latitudeDelta: 1, longitudeDelta: 1}
+      region: {latitude: 0, longitude: 0, latitudeDelta: 2, longitudeDelta: 2}
     }
   }
 
@@ -73,13 +75,17 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
     navigator.geolocation.getCurrentPosition(this.getPosition);
 
     this._getApiFires();
+
   }
 
   // sets gps coords
   getPosition = (position: any) => {
     myLat = position.coords.latitude;
     myLon = position.coords.longitude;
-    this.setState({region: {latitude: myLat, longitude: myLon, latitudeDelta: 1, longitudeDelta: 1}});
+
+    // set mapview region
+    let region = {latitude: myLat, longitude: myLon, latitudeDelta: 2, longitudeDelta: 2};
+    this.setState({region});
   }
 
   async _getApiFires() {
@@ -99,7 +105,7 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
 
           //set lat/long object properties and get distance from user
           if (apifires.length > 0) {
-            apifires.forEach(function (fire: any) {
+            apifires.forEach(async function (fire: any) {
               let lat = Number(fire['geo:lat']); 
               let lon = Number(fire['geo:long']);
               fire.lat = lat;
@@ -118,6 +124,9 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
 
               // // save dist in miles
               fire.distanceFromUser = Math.round((dist*0.000621) * 100) / 100;
+
+              let locText:string = await getLocationText(lat, lon) as string;
+              fire.location = locText;
             });
           }    
 
@@ -153,7 +162,7 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
   }
 
   onRegionChange(region: any) {
-    this.setState({ region });
+    //this.setState({ region });
   }
 
   render() {
@@ -164,12 +173,22 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
             region={this.state.region}
             onRegionChange={this.onRegionChange}
             >
+            <Button
+              buttonStyle={{ backgroundColor: '#36454f', width: '100%', borderRadius: 1, marginLeft: 0, marginRight: 0, marginBottom: 3, marginTop: 0 }}
+              title={'  View Fires(' + this.state.apiFires.length +') in List'}
+              onPress={() => this.props.navigation.navigate('AllFires')}
+            />
             {this.state.apiFires.map(fire => (
                 <Marker
                   key={fire.id}
+                  // image={require('../../assets/fire-icon.png')}
                   coordinate={fire.coordinate}
                   title={fire.title}
+                  pinColor={ '#ffbf00' }
                   description={fire.description}
+                  onCalloutPress={() =>this.props.navigation.navigate('SingleFire', {
+                    apiFire: fire, location: fire.location,
+                  })}
                 />
             ))}
             </MapView>
@@ -181,12 +200,6 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
   text: {
     backgroundColor: 'white',
     color: 'black',
