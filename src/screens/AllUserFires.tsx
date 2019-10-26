@@ -8,7 +8,6 @@ import FirePreviewCard from '../components/FirePreviewCard';
 
 // external libs
 import { getDistance } from 'geolib';
-const parseString = require('react-native-xml2js').parseString;
 
 interface IHomeProps extends NavigationStackScreenProps { }
 interface IHomeState {

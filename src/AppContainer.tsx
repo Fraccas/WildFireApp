@@ -7,6 +7,7 @@ import { createStackNavigator } from 'react-navigation-stack';
 import AllFires  from './screens/AllFires';
 import SingleFire  from './screens/SingleFire';
 import AddFire from './screens/AddFire';
+import MapFireView from './screens/MapFireView';
 
 import AuthLoading from './screens/AuthLoading';
 import Login from './screens/Login';
@@ -35,6 +36,7 @@ const AppStack = createStackNavigator({
     // screens
     AllFires,
     SingleFire,
+    MapFireView,
     AddFire,
     Settings
 }, {

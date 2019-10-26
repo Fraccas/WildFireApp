@@ -12,7 +12,7 @@ interface Props extends NavigationInjectedProps {
         lat: number,
         lon: number,
         distanceFromUser: number,
-        discription: string
+        description: string
     }
     
 }
@@ -43,7 +43,7 @@ class ApiFirePreviewCard extends React.Component<Props, State> {
                     title={this.props.apifire.title[0]}
                     image={{uri: 'https://images.newscientist.com/wp-content/uploads/2018/08/08114243/rexfeatures_9778243j.jpg'}}
                 >
-                    <Text style={{marginBottom: 10}}>{`Distance from you: ${this.props.apifire.distanceFromUser} miles`}</Text>
+                    <Text style={{marginBottom: 10, fontWeight: "bold"}}>{`Distance from you: ${this.props.apifire.distanceFromUser} miles`}</Text>
                     <Text style={{marginBottom: 10}}>{`Located in ${this.state.locationText}`}</Text>
                     <Text style={{marginBottom: 10}}>{`${this.props.apifire.published}`}</Text>
                     <Button
