@@ -8,17 +8,17 @@ export let getLocationText = async (lat: number, lon: number) => {
             let response = await fetch('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lon + '&sensor=true&key=' + key); 
             const location = await response.json();
             
-            if (location['plus_code']['compound_code']) {
+            if (location['plus_code']['compound_code']) { // api simple county/state/country tag
                 let locationText: string = location['plus_code']['compound_code'].substring(8);
                 return locationText;
-            } else if (location['results'][0]['formatted_address']) {
-                return location['results'][0]['formatted_address'];
+            } else if (location['results'][0]['formatted_address']) { // not all have compound_code. this gives
+                return location['results'][0]['formatted_address'];   // an alt location description
             } else {
                 console.log();
-                return 'Location Error';
+                return 'Location Error'; // no location data avaiable 
             }
         } catch (e) {
-            console.log('error getting phones gps location');
+            console.log('error getting phones gps location - Fraccas');
             throw e;
         }
     } else {
