@@ -66,7 +66,7 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
     super(props);
     this.state = {
       apiFires: [],
-      region: {latitude: 0, longitude: 0, latitudeDelta: 2, longitudeDelta: 2}
+      region: {latitude: 0, longitude: 0, latitudeDelta: 5, longitudeDelta: 5}
     }
   }
 
@@ -84,7 +84,7 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
     myLon = position.coords.longitude;
 
     // set mapview region
-    let region = {latitude: myLat, longitude: myLon, latitudeDelta: 2, longitudeDelta: 2};
+    let region = {latitude: myLat, longitude: myLon, latitudeDelta: 5, longitudeDelta: 5};
     this.setState({region});
   }
 
@@ -181,7 +181,7 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
             {this.state.apiFires.map(fire => (
                 <Marker
                   key={fire.id}
-                  // image={require('../../assets/fire-icon.png')}
+                  image={require('../../assets/flame.png')}
                   coordinate={fire.coordinate}
                   title={fire.title}
                   pinColor={ '#ffbf00' }
@@ -205,7 +205,8 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 25,
     margin: 5,
-    fontFamily: 'Cochin'
+    fontFamily: 'Cochin',
+    alignContent: 'center'
   },
   map: {
     position: 'absolute',

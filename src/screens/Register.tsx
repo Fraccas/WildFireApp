@@ -7,18 +7,22 @@ import { json, SetAccessToken, GetUser, SetEmail, SetPhone } from '../utils/api'
 
 interface Props extends NavigationStackScreenProps {}
 interface State {
+    username: string,
+    phone: string,
     email: string,
     password: string
 }
 
-export default class Login extends React.Component<Props, State> {
+export default class Register extends React.Component<Props, State> {
     static navigationOptions: NavigationScreenOptions = {
-        headerTitle: "Login"
+        headerTitle: "New Account"
     };
 
     constructor(props: Props) {
         super(props);
         this.state = {
+            username: '',
+            phone: '',
             email: '',
             password: ''
         };
@@ -31,10 +35,39 @@ export default class Login extends React.Component<Props, State> {
         }
     }
 
-    async handleLogin () {
+    // async handleRegister () {
+    //     try {
+    //         let result = await json('https://report-wildfire-app.herokuapp.com/auth/register', 'POST', {
+    //             name: this.state.username,
+    //             phone: this.state.phone,
+    //             email: this.state.email,
+    //             password: this.state.password
+    //         });
+
+    //         if (result) {
+    //             await SetAccessToken(result.token, {userid: result.userid, name: result.name, role: result.role, phone: result.phone});
+    //             let user = await GetUser();
+    //             if (user && user.role) {
+    //                 SetEmail(this.state.email);
+    //                 this.props.navigation.navigate('AllFires');
+    //             } else {
+    //                 Alert.alert('Invalid login information!');
+    //             }
+    //         } else {
+    //             Alert.alert('Invalid login information!');
+    //         }
+    //     } catch(e) {
+    //         console.log(e);
+    //         Alert.alert("Problem logging in? Contact your admin!");
+    //     }
+    // }
+
+    async handleRegister () {
         try {
-            let result = await json('https://report-wildfire-app.herokuapp.com/auth/login', 'POST', {
+            let result = await json('https://report-wildfire-app.herokuapp.com/auth/register', 'POST', {
+                name: this.state.email,
                 email: this.state.email,
+                phone: this.state.phone,
                 password: this.state.password
             });
 
@@ -42,18 +75,18 @@ export default class Login extends React.Component<Props, State> {
                 await SetAccessToken(result.token, {userid: result.userid, name: result.name, role: result.role, phone: result.phone});
                 let user = await GetUser();
                 if (user && user.role) {
-                    SetEmail(this.state.email);
-                    SetPhone(user.phone);
+                    SetEmail(this.state.email); // set user data locally
+                    SetPhone(this.state.phone);
                     this.props.navigation.navigate('AllFires');
                 } else {
-                    Alert.alert('Invalid login information!');
+                    Alert.alert('Invalid user information!'); 
                 }
             } else {
-                Alert.alert('Invalid login information!');
+                Alert.alert('Invalid user information!');
             }
         } catch(e) {
             console.log(e);
-            Alert.alert("Problem logging in? Contact your admin!");
+            Alert.alert("Problem registering? Contact your admin!");
         }
     }
 
@@ -66,18 +99,28 @@ export default class Login extends React.Component<Props, State> {
             <View style={styles.container}>
                 <View style={{flex:1, justifyContent: 'center', alignItems: 'center'}}>
                     <Input 
+                        containerStyle={{marginVertical: 15}}
+                        placeholder=" username..."
+                        value={this.state.username}
+                        onChangeText={(text) => this.setState({username: text})}
+                    />
+                    <Input 
                         textContentType="emailAddress"
                         containerStyle={{marginVertical: 15}}
-                        leftIcon={{type: 'font-awesome', name: 'envelope'}}
                         placeholder=" Email..."
                         value={this.state.email}
                         onChangeText={(text) => this.setState({email: text})}
                     />
                     <Input 
                         containerStyle={{marginVertical: 15}}
+                        placeholder=" Phone..."
+                        value={this.state.phone}
+                        onChangeText={(text) => this.setState({phone: text})}
+                    />
+                    <Input 
+                        containerStyle={{marginVertical: 15}}
                         secureTextEntry={true}
                         textContentType="password"
-                        leftIcon={{type: 'font-awesome', name: 'key'}}
                         placeholder=" Password..."
                         value={this.state.password}
                         onChangeText={(text) => this.setState({password: text})}
@@ -86,17 +129,10 @@ export default class Login extends React.Component<Props, State> {
                 <View style={{flex:1}}>
                     <Button 
                         raised
-                        title="Login"
-                        containerStyle={{margin: 10}}
-                        buttonStyle={{backgroundColor: '#36454f'}}
-                        onPress={() => this.handleLogin()}
-                    />
-                    <Button 
-                        raised
                         title="Create Account"
                         containerStyle={{margin: 10}}
                         buttonStyle={{backgroundColor: '#36454f'}}
-                        onPress={() => this.sendRegister()}
+                        onPress={() => this.handleRegister()}
                     />
                 </View>
             </View>

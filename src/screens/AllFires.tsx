@@ -139,7 +139,7 @@ export default class AllFires extends React.Component<IHomeProps, IHomeState> {
         </>
       );
     } else {
-      return (<Text style={styles.text}>Loading fire data...</Text>);
+      return (<Text style={styles.loading}>Loading fire data...</Text>);
     }
   }
 }
@@ -158,5 +158,13 @@ const styles = StyleSheet.create({
     fontSize: 25,
     margin: 5,
     fontFamily: 'Cochin'
+  },
+  loading: {
+    backgroundColor: 'white',
+    color: 'black',
+    fontSize: 25,
+    margin: 5,
+    fontFamily: 'Cochin',
+    alignContent: 'center'
   }
 });

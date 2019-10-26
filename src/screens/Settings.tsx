@@ -3,7 +3,7 @@ import { StyleSheet, View, Alert, Picker, ScrollView, AsyncStorage } from 'react
 import { NavigationStackScreenProps } from 'react-navigation-stack';
 import { NavigationScreenOptions } from 'react-navigation';
 import { Input, Button, Text } from 'react-native-elements';
-import { ClearUser, GetUser, SetEmail, GetEmail } from '../utils/api';
+import { ClearUser, GetUser, SetEmail, GetEmail, GetPhone } from '../utils/api';
 
 interface Props extends NavigationStackScreenProps {}
 interface State {
@@ -14,6 +14,7 @@ interface State {
     newPhone: string
 }
 
+let emailHolder, phoneHolder;
 export default class Settings extends React.Component<Props, State> {
     static navigationOptions: NavigationScreenOptions = {
         headerTitle: "Settings"
@@ -35,8 +36,11 @@ export default class Settings extends React.Component<Props, State> {
     getUserData = async () => {
         let user = await GetUser();
         let email = await GetEmail();
+        let phone = await GetPhone();
         this.setState({email});
-        this.setState({phone: user.phone});
+        this.setState({phone});
+        emailHolder = email;
+        phoneHolder = phone;
     }
 
     handleSubmit = () => {
@@ -57,13 +61,13 @@ export default class Settings extends React.Component<Props, State> {
                     <Input
                         label="Email"
                         inputContainerStyle={{borderBottomWidth: 1}}
-                        value={this.state.email}
+                        placeholder={this.state.email}
                         onChangeText={(text) => this.setState({newEmail: text})}
                     />        
                     <Input
                         label="Phone"
                         inputContainerStyle={{borderBottomWidth: 1}}
-                        value={this.state.phone}
+                        placeholder={this.state.phone}
                         onChangeText={(text) => this.setState({newPhone: text})}
                     />    
                 </View>

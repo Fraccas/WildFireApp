@@ -11,13 +11,15 @@ import MapFireView from './screens/MapFireView';
 
 import AuthLoading from './screens/AuthLoading';
 import Login from './screens/Login';
+import Register from './screens/Register';
 import Settings from './screens/Settings';
 
 
 
 const AuthStack = createStackNavigator({
     // screens
-    Login
+    Login,
+    Register
 }, {
     // generic styling
     initialRouteName: 'Login',

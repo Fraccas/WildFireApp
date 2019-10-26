@@ -42,6 +42,7 @@ export const json = async <T = any>(uri: string, method: string = "GET", body?: 
 };
 
 export const SetAccessToken = async (token: string, user: {userid: undefined, name: 'undefined', role: 'undefined', phone: 'undefined'}) => {
+    console.log(user);
     await AsyncStorage.setItem('token', token);
     await AsyncStorage.setItem('user', JSON.stringify(user));
 }
@@ -53,4 +54,13 @@ export const SetEmail = async (email: string) => {
 export const GetEmail = async() => {
     let email: any = await AsyncStorage.getItem('email');
     return email;
+}
+
+export const SetPhone = async (phone: string) => {
+    await AsyncStorage.setItem('phone', phone);
+}
+
+export const GetPhone = async() => {
+    let phone: any = await AsyncStorage.getItem('phone');
+    return phone;
 }
