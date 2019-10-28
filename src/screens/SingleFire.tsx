@@ -13,7 +13,7 @@ interface State {
         lat: number,
         lon: number,
         distanceFromUser: number,
-        description: string
+        descriptionText: string
     },
     location: string
 }
@@ -27,7 +27,7 @@ export default class SingleFire extends React.Component<Props, State> {
     constructor(props: Props) {
       super(props);
       this.state = {
-        apiFire: {id: '', title: '', published: '', link: '', lat: 0, lon: 0, distanceFromUser: 0, description: ''},
+        apiFire: {id: '', title: '', published: '', link: '', lat: 0, lon: 0, distanceFromUser: 0, descriptionText: ''},
         location: ''
       };
     }
@@ -45,7 +45,7 @@ export default class SingleFire extends React.Component<Props, State> {
     }
 
     render() {
-      const {title, published, link, distanceFromUser, description } = this.state.apiFire;
+      const {title, published, link, distanceFromUser, descriptionText } = this.state.apiFire;
       return (
         
           <View style={styles.container}>
@@ -54,7 +54,7 @@ export default class SingleFire extends React.Component<Props, State> {
             <ScrollView>
             <View style={styles.container}>
             <Text style={styles.altText}>{distanceFromUser} MILES FROM YOUR LOCATION</Text>
-                <Text style={styles.bodyTextStyle}>{description}</Text>
+                <Text style={styles.bodyTextStyle}>{descriptionText}</Text>
                 <Text style={styles.altText}>Fire Published: {published}</Text>               
 
                 <Button 

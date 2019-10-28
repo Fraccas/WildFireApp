@@ -22,7 +22,7 @@ interface apiFire {
   lat: number,
   lon: number,
   distanceFromUser: number,
-  description: string,
+  descriptionText: string,
   coordinate : {
     latitude: number,
     longitude: number
@@ -39,7 +39,7 @@ interface IHomeState {
     lat: number,
     lon: number,
     distanceFromUser: number,
-    description: string,
+    descriptionText: string,
     coordinate : {
       latitude: number,
       longitude: number
@@ -66,7 +66,7 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
     super(props);
     this.state = {
       apiFires: [],
-      region: {latitude: 0, longitude: 0, latitudeDelta: 5, longitudeDelta: 5}
+      region: {latitude: 0, longitude: 0, latitudeDelta: 10, longitudeDelta: 10}
     }
   }
 
@@ -84,7 +84,7 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
     myLon = position.coords.longitude;
 
     // set mapview region
-    let region = {latitude: myLat, longitude: myLon, latitudeDelta: 5, longitudeDelta: 5};
+    let region = {latitude: myLat, longitude: myLon, latitudeDelta: 10, longitudeDelta: 10};
     this.setState({region});
   }
 
@@ -106,14 +106,15 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
           //set lat/long object properties and get distance from user
           if (apifires.length > 0) {
             apifires.forEach(async function (fire: any) {
+
               let lat = Number(fire['geo:lat']); 
               let lon = Number(fire['geo:long']);
               fire.lat = lat;
               fire.lon = lon;
 
               fire.id = 'map-fire-'+fire.title[0];
-              fire.title = fire.title[0];
-              fire.description = fire.description[0];
+              fire.title = fire.title[0]; 
+
               fire.link = fire.link[0];
               fire.coordinate = {latitude: fire.lat, longitude: fire.lon};
 
@@ -127,12 +128,22 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
 
               let locText:string = await getLocationText(lat, lon) as string;
               fire.location = locText;
+
+              // admins don't always add descriptions
+              if (fire.description === undefined) {              
+                fire.descriptionText = 'No description provided...';
+              } else 
+                fire.descriptionText = fire.description[0];
             });
           }    
 
           apifires.sort((a:apiFire, b:apiFire) => (a.distanceFromUser > b.distanceFromUser) ? 1 : -1);
 
           this.setState({ apiFires: apifires });
+
+          this.state.apiFires.map(fire => {
+            console.log(typeof fire.descriptionText);
+          });
         })
         .catch((err) => {
           console.log('Error fetching the feed: ', err)
@@ -175,21 +186,21 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
             >
             <Button
               buttonStyle={{ backgroundColor: '#36454f', width: '100%', borderRadius: 1, marginLeft: 0, marginRight: 0, marginBottom: 3, marginTop: 0 }}
-              title={'  View Fires(' + this.state.apiFires.length +') in List'}
+              title={'  View Fires(' + this.state.apiFires.length +') in List Mode'}
               onPress={() => this.props.navigation.navigate('AllFires')}
             />
             {this.state.apiFires.map(fire => (
                 <Marker
-                  key={fire.id}
-                  image={require('../../assets/flame.png')}
-                  coordinate={fire.coordinate}
-                  title={fire.title}
-                  pinColor={ '#ffbf00' }
-                  description={fire.description}
-                  onCalloutPress={() =>this.props.navigation.navigate('SingleFire', {
-                    apiFire: fire, location: fire.location,
-                  })}
-                />
+                key={fire.id}
+                image={require('../../assets/flame.png')}
+                coordinate={fire.coordinate}
+                title={fire.title}
+                pinColor={ '#ffbf00' }
+                description={fire.descriptionText}
+                onCalloutPress={() =>this.props.navigation.navigate('SingleFire', {
+                apiFire: fire, location: fire.location,
+                })}               
+              />
             ))}
             </MapView>
       );

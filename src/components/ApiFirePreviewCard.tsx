@@ -12,7 +12,7 @@ interface Props extends NavigationInjectedProps {
         lat: number,
         lon: number,
         distanceFromUser: number,
-        description: string
+        descriptionText: string
     }
     
 }

@@ -18,7 +18,7 @@ interface apiFire {
   lat: number,
   lon: number,
   distanceFromUser: number,
-  description: string
+  descriptionText: string
 }[]
 interface IHomeProps extends NavigationStackScreenProps { }
 interface IHomeState {
@@ -30,7 +30,7 @@ interface IHomeState {
     lat: number,
     lon: number,
     distanceFromUser: number,
-    description: string
+    descriptionText: string
   }[]
 }
 
@@ -93,6 +93,12 @@ export default class AllFires extends React.Component<IHomeProps, IHomeState> {
 
               // // save dist in miles
               fire.distanceFromUser = Math.round((dist*0.000621) * 100) / 100;
+
+              // admins don't always add descriptions
+              if (fire.description === undefined) {              
+                fire.descriptionText = 'No description provided...';
+              } else 
+                fire.descriptionText = fire.description[0];
             });
           }    
 
