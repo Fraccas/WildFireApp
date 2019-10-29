@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { StyleSheet, Text } from 'react-native';
-import { Button} from 'react-native-elements';
+import { Button } from 'react-native-elements';
 import { NavigationStackScreenProps } from 'react-navigation-stack';
 import { NavigationScreenOptions, NavigationEvents } from 'react-navigation';
 import { getLocationText } from '../utils/map';
+import { json } from '../utils/api';
 
 import ApiFirePreviewCard from '../components/ApiFirePreviewCard';
 import MapView from 'react-native-maps';
@@ -23,7 +24,7 @@ interface apiFire {
   lon: number,
   distanceFromUser: number,
   descriptionText: string,
-  coordinate : {
+  coordinate: {
     latitude: number,
     longitude: number
   }
@@ -40,18 +41,35 @@ interface IHomeState {
     lon: number,
     distanceFromUser: number,
     descriptionText: string,
-    coordinate : {
+    coordinate: {
       latitude: number,
       longitude: number
     },
     location: string
   }[],
   region: {
+    latitude: number,
+    longitude: number,
+    latitudeDelta: number,
+    longitudeDelta: number
+  },
+  userFires: {
+    id: number,
+    lat: number,
+    lon: number,
+    userid: string,
+    threat: string,
+    photo: string,
+    _created: Date,
+    distanceFromUser: number,
+    description: string,
+    descriptionText: string,
+    coordinate: {
       latitude: number,
-      longitude: number,
-      latitudeDelta: number,
-      longitudeDelta: number
-  }
+      longitude: number
+    },
+    location: string
+  }[]
 }
 
 let myLat: number;
@@ -66,7 +84,8 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
     super(props);
     this.state = {
       apiFires: [],
-      region: {latitude: 0, longitude: 0, latitudeDelta: 10, longitudeDelta: 10}
+      region: { latitude: 0, longitude: 0, latitudeDelta: 10, longitudeDelta: 10 },
+      userFires: []
     }
   }
 
@@ -75,7 +94,7 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
     navigator.geolocation.getCurrentPosition(this.getPosition);
 
     this._getApiFires();
-
+    this._getUserFires();
   }
 
   // sets gps coords
@@ -84,8 +103,37 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
     myLon = position.coords.longitude;
 
     // set mapview region
-    let region = {latitude: myLat, longitude: myLon, latitudeDelta: 10, longitudeDelta: 10};
-    this.setState({region});
+    let region = { latitude: myLat, longitude: myLon, latitudeDelta: 10, longitudeDelta: 10 };
+    this.setState({ region });
+  }
+
+  async _getUserFires() {
+    try {
+      let fires = await json('https://report-wildfire-app.herokuapp.com/api/fires');
+
+      fires.forEach(async function (fire: any) {
+        const dist = getDistance(
+          { latitude: fire.lat, longitude: fire.lon },
+          { latitude: myLat, longitude: myLon }
+        );
+        // save dist in miles
+        fire.distanceFromUser = Math.round((dist * 0.000621) * 100) / 100;
+        
+        fire.descriptionText = "This is an unconfirmed fire submitted by a user. The user marked this fire as: (" + fire.threat + " Threat). User Description: " + fire.description;
+        let shortText= "This fire has not been confirmed. Read more...";
+
+        fire.description = shortText;
+
+        fire.coordinate = {latitude: fire.lat, longitude: fire.lon}
+        let locText: string = await getLocationText(fire.lat, fire.lon) as string;
+              fire.location = locText;
+      });
+
+      this.setState({ userFires: fires });
+
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async _getApiFires() {
@@ -93,7 +141,7 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
       fetch('https://inciweb.nwcg.gov/feeds/rss/incidents/') // get xml from api
         .then(response => response.text())
         .then((responseText) => {
-          let apifires:any;
+          let apifires: any;
           parseString(responseText, function (err: any, result: any) {
             if (result) {
               let jsonFire: any = JSON.stringify(result); // convert xml to json text
@@ -107,16 +155,16 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
           if (apifires.length > 0) {
             apifires.forEach(async function (fire: any) {
 
-              let lat = Number(fire['geo:lat']); 
+              let lat = Number(fire['geo:lat']);
               let lon = Number(fire['geo:long']);
               fire.lat = lat;
               fire.lon = lon;
 
-              fire.id = 'map-fire-'+fire.title[0];
-              fire.title = fire.title[0]; 
+              fire.id = 'map-fire-' + fire.title[0];
+              fire.title = fire.title[0];
 
               fire.link = fire.link[0];
-              fire.coordinate = {latitude: fire.lat, longitude: fire.lon};
+              fire.coordinate = { latitude: fire.lat, longitude: fire.lon };
 
               const dist = getDistance(
                 { latitude: lat, longitude: lon },
@@ -124,26 +172,22 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
               );
 
               // // save dist in miles
-              fire.distanceFromUser = Math.round((dist*0.000621) * 100) / 100;
+              fire.distanceFromUser = Math.round((dist * 0.000621) * 100) / 100;
 
-              let locText:string = await getLocationText(lat, lon) as string;
+              let locText: string = await getLocationText(lat, lon) as string;
               fire.location = locText;
 
               // admins don't always add descriptions
-              if (fire.description === undefined) {              
+              if (fire.description === undefined) {
                 fire.descriptionText = 'No description provided...';
-              } else 
+              } else
                 fire.descriptionText = fire.description[0];
             });
-          }    
+          }
 
-          apifires.sort((a:apiFire, b:apiFire) => (a.distanceFromUser > b.distanceFromUser) ? 1 : -1);
+          apifires.sort((a: apiFire, b: apiFire) => (a.distanceFromUser > b.distanceFromUser) ? 1 : -1);
 
           this.setState({ apiFires: apifires });
-
-          this.state.apiFires.map(fire => {
-            console.log(typeof fire.descriptionText);
-          });
         })
         .catch((err) => {
           console.log('Error fetching the feed: ', err)
@@ -151,13 +195,6 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
     } catch (e) {
       throw e;
     }
-  }
-
-  renderApiFires() {
-    return this.state.apiFires.map((apifire, index) => {
-      apifire.id = 'api-fire' + index;
-      return <ApiFirePreviewCard key={apifire.id} apifire={apifire} />
-    });
   }
 
   // Map View Functions
@@ -180,29 +217,42 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
     if (this.state.apiFires.length > 0) {
       return (
         <MapView
-            style={styles.map}
-            region={this.state.region}
-            onRegionChange={this.onRegionChange}
-            >
-            <Button
-              buttonStyle={{ backgroundColor: '#36454f', width: '100%', borderRadius: 1, marginLeft: 0, marginRight: 0, marginBottom: 3, marginTop: 0 }}
-              title={'  View Fires(' + this.state.apiFires.length +') in List Mode'}
-              onPress={() => this.props.navigation.navigate('AllFires')}
-            />
-            {this.state.apiFires.map(fire => (
-                <Marker
-                key={fire.id}
-                image={require('../../assets/flame.png')}
-                coordinate={fire.coordinate}
-                title={fire.title}
-                pinColor={ '#ffbf00' }
-                description={fire.descriptionText}
-                onCalloutPress={() =>this.props.navigation.navigate('SingleFire', {
+          style={styles.map}
+          region={this.state.region}
+          onRegionChange={this.onRegionChange}
+        >
+          <Button
+            buttonStyle={{ backgroundColor: '#36454f', width: '100%', borderRadius: 1, marginLeft: 0, marginRight: 0, marginBottom: 3, marginTop: 0 }}
+            title={'  View Fires(' + this.state.apiFires.length + ') in List Mode'}
+            onPress={() => this.props.navigation.navigate('AllFires')}
+          />
+          {this.state.apiFires.map(fire => (
+            <Marker
+              key={fire.id}
+              image={require('../../assets/flame.png')}
+              coordinate={fire.coordinate}
+              title={fire.title}
+              pinColor={'#ffbf00'}
+              description={fire.descriptionText}
+              onCalloutPress={() => this.props.navigation.navigate('SingleFire', {
                 apiFire: fire, location: fire.location,
-                })}               
+              })}
+            />
+          ))}
+          {this.state.userFires.map(fire => (
+              <Marker
+                key={fire.id}
+                image={require('../../assets/warning.png')}
+                coordinate={fire.coordinate}
+                title={"User Submitted Fire"}
+                pinColor={'#ffbf00'}
+                description={fire.description}
+                onCalloutPress={() => this.props.navigation.navigate('SingleFire', {
+                  apiFire: fire, location: fire.location,
+                })}
               />
             ))}
-            </MapView>
+        </MapView>
       );
     } else {
       return (<Text style={styles.text}>Loading fire data...</Text>);
