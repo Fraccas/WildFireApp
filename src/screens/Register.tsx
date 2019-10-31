@@ -65,14 +65,18 @@ export default class Register extends React.Component<Props, State> {
     async handleRegister () {
         try {
             let result = await json('https://report-wildfire-app.herokuapp.com/auth/register', 'POST', {
-                name: this.state.email,
+                name: this.state.username,
                 email: this.state.email,
                 phone: this.state.phone,
                 password: this.state.password
             });
 
+            if (!result.name) result.name = this.state.username;
+            if (!result.phone) result.phone = this.state.phone;
+            if (!result.mail) result.email = this.state.email;
+
             if (result) {
-                await SetAccessToken(result.token, {userid: result.userid, name: result.name, role: result.role, phone: result.phone});
+                await SetAccessToken(result.token, {userid: result.userid, name: result.name, role: result.role, phone: result.phone, email: result.email});
                 let user = await GetUser();
                 if (user && user.role) {
                     SetEmail(this.state.email); // set user data locally

@@ -110,6 +110,11 @@ export default class MapFireView extends React.Component<IHomeProps, IHomeState>
   async _getUserFires() {
     try {
       let fires = await json('https://report-wildfire-app.herokuapp.com/api/fires');
+      console.log(fires);
+      if (!fires) {
+        console.log("No user fires loaded");
+        return;
+      }
 
       fires.forEach(async function (fire: any) {
         const dist = getDistance(
