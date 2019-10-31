@@ -42,7 +42,6 @@ export const json = async <T = any>(uri: string, method: string = "GET", body?: 
 };
 
 export const SetAccessToken = async (token: string, user: {userid: undefined, name: 'undefined', role: 'undefined', phone: 'undefined', email: 'undefined'}) => {
-    console.log(user);
     await AsyncStorage.setItem('token', token);
     await AsyncStorage.setItem('user', JSON.stringify(user));
 }
